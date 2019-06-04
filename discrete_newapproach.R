@@ -11,9 +11,9 @@ BSiter <- 20 # maybe more ~2000 for final simus
 number_iteration <- 50 # more for final simus ~5000
 
 rate_0 <- 10
-rate_1 <- 11
+rate_1 <- 10
 rate_2 <- 5
-rate_cens <- 16
+rate_cens <- 18
 
 rate_21 <- 10
 rate_22 <- 5
@@ -39,10 +39,10 @@ for (n in c(1000)){
     start_state <- rep(0,n)
     T_01 <- rpois(n,rate_0) + 1 # time health to ill state
     T_02 <- rpois(n,rate_1) + 1 # time health to death state 
-    T_12 <- rpois(n,rate_21)*(pmin(T_01,T_02) < 50) + rpois(n,rate_22)*(pmin(T_01,T_02) >= 50) # time from ill to death state, dependend on the state of each individual at time 25
+    T_12 <- rpois(n,rate_21)*(pmin(T_01,T_02) < 17) + rpois(n,rate_22)*(pmin(T_01,T_02) >= 17) # time from ill to death state, dependend on the state of each individual at time 25
     cens <- rpois(n,rate_cens) # time to censoring
     state_1 <- 1*(T_01 < pmin(T_02,cens)) + 2*(T_02 < pmin(T_01,cens)) + 3*(cens <= pmin(T_01,T_02))
-    state_2 <- 2*(cens > T_01+T_12) + 3*(T_01 <= cens & cens <= T_01+T_12)
+    state_2 <- 2*(cens >= T_01+T_12) + 3*(T_01 < cens & cens < T_01+T_12)
     
     # results in time-discrete non-markovian multi-state process
     # state 3 = censored
@@ -86,7 +86,7 @@ for (n in c(1000)){
 
 # next: Markovian case
 
-for (n in c(20,50,100,300,500,700,1000)){
+for (n in c(1000)){
   
   for (k in 1:number_iteration){
   
@@ -98,7 +98,7 @@ for (n in c(20,50,100,300,500,700,1000)){
     T_12 <- rpois(n,rate_2) + 1 # time from ill to death state
     cens <- rpois(n,rate_cens) + 1 # time to censoring
     state_1 <- 1*(T_01 < pmin(T_02,cens)) + 2*(T_02 < pmin(T_01,cens)) + 3*(cens <= pmin(T_01,T_02))
-    state_2 <- 2*(cens > T_01+T_12) + 3*(T_01 <= cens & cens <= T_01+T_12)
+    state_2 <- 2*(cens >= T_01+T_12) + 3*(T_01 < cens & cens < T_01+T_12)
     
     # results in time-discrete markovian multi-state process'
     # state 3 = censored
